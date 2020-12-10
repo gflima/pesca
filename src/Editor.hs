@@ -11,6 +11,7 @@ import Calculi
 import Axioms
 import Natural
 import System.Cmd (system)
+import System.IO
 import System.IO.Error (isEOFError)
 import Control.Exception (catch, toException, SomeException(..))
 
@@ -31,6 +32,7 @@ editProofs :: (Env,[String]) -> IO (Proof,String)
 editProofs envh@(env@(calculus,tree),history) =
  do
  putStr "|- "
+ hFlush stdout
  s <- catch getLine (\e -> if isEOFError e then return "q" else ioError e)
  let (comm,m0)  = case pCommand calculus s of
                     (x,""):_ -> (x,     "")
