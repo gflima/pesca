@@ -63,9 +63,9 @@ editProofs envh@(env@(calculus,tree),history) =
       CChange calc' -> let (c,m) = changeCalculus calculus calc' in
                         do putStr m
                            editProofs ((c,tree'),history')
-      CQuit         -> do writeFile "myhistory.txt"
-                                    (foldr (++++) "" (history ++ ["q"]))
-                          putStr "history written in myhistory.txt\n"
+      CQuit         -> do --writeFile "myhistory.txt"
+                          --          (foldr (++++) "" (history ++ ["q"]))
+                          --putStr "history written in myhistory.txt\n"
                           return (tree',"")
       CManual       -> do system "latex manual.tex >& /dev/null ; xdvi manual.dvi &"
                           editProofs envh'
