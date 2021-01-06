@@ -52,7 +52,7 @@ pTerm2 =
  |||
   pParenth pTerm
 
-pScheme = longestOfSome pCapital                       -- 1+ capital letters
+pScheme = longestOfSome pCapital ... longestOfMany pDigit *** junct2 -- 1+ capital letters, 1+ digits
 pPred   = pCapital ... longestOfSome pSmall *** junct  -- capit. with 1+ small 
 pConst  = pSmall   ... longestOfSome pSmall *** junct  -- 2+ small letters
            |||
@@ -72,6 +72,7 @@ pInfix =
   literal '\\' ... longestOfSome pLetter *** junct
 
 junct (a,b) = a:b
+junct2 (a,b) = a ++ b
 
 pSmall   = satisfy (`elem` ['a'..'z'])
 pCapital = satisfy (`elem` ['A'..'Z'])
