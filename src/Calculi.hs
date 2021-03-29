@@ -131,7 +131,7 @@ g4iLImpl =
                    Neg  (Impl c d)   : rest ->
                           Just [(c : Impl d Falsum : rest, [d])]
                    Neg  (Neg c)      : rest ->
-                          Just [(c :  rest, suc)]
+                          Just [(Impl (Neg c) Falsum : rest, suc)]
                    _               -> Nothing)
  ]
 
