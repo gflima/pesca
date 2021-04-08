@@ -54,9 +54,9 @@ pTerm2 =
 
 pScheme = longestOfSome pCapital ... longestOfMany pDigit *** junct2 -- 1+ capital letters, 1+ digits
 pPred   = pCapital ... longestOfSome pSmall *** junct  -- capit. with 1+ small 
-pConst  = pSmall ... pVar *** junct
-           |||
-          pSmall   ... longestOfSome pSmall *** junct  -- 2+ small letters
+
+pConst' = longestOfSome pSmall   ... longestOfMany (literal '\'') *** junct2
+pConst  = pSmall ... pConst' *** junct
            |||
           longestOfSome pDigit                         -- or 1+ digits
 pVar    = pSmall   ... longestOfMany (literal '\'') *** junct
