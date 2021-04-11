@@ -13,11 +13,12 @@ rulesOfCalculus (Calculus calcs) = foldl (++) [] (map rOf calcs) where
    "G3ip"  -> justPremises $ gxpL ++ gipR ++ g3iLImpl
    "G4ip"  -> justPremises $ gxpL ++ gipR ++ g4iLImpl
    "G3cp"  -> justPremises $ gxpL ++ gcpRL
-   "G3i"   -> justPremises  (gxpL ++ gipR ++ g3iLImpl) ++ g3xqL ++ g3iqR 
+   "G3i"   -> justPremises  (gxpL ++ gipR ++ g3iLImpl) ++ g3xqL ++ g3iqR
    "G3c"   -> justPremises  (gxpL ++ gcpRL           ) ++ g3xqL ++ g3cqR
    "G4i"   -> justPremises  (gxpL ++ gipR ++ g4iLImpl) ++ g3xqL ++ g3iqR
    "Geq"   -> gxeq
    -------------------------------- ADD YOUR OWN CALCULUS HERE
+   "G3ch"  -> justPremises  (gxpL ++ gcpRL           ) ++ g3xqL' ++ g3cqR'
    _      -> []
 
 prCalculi = "G3i G4i G3c G3ip G4ip G3cp Geq"
@@ -150,6 +151,22 @@ g3xqL =
                 _          -> Nothing)
  ]
 
+g3xqL' = 
+ [
+  ("L/A", \ (ant,suc) -> 
+              case ant of
+                Univ x a : ant' -> 
+                  Just [Left (a' : Univ x a : ant', suc), Right "?v"]
+                    where a' = substFormula ["?v"] substVar [(x,NewMeta "?v")] a
+                _          -> Nothing),
+  ("L/E", \ (ant,suc) -> 
+              case ant of
+                Exist x a : ant' -> 
+                  Just [Left (a' : Exist x a : ant', suc), Right "?f"]
+                    where a' = substFormula ["?f"] substVar [(x,NewMeta "?f")] a
+                _          -> Nothing)
+ ]
+
 g3iqR = 
  [("R/A", \ (ant,suc) -> 
               case suc of
@@ -175,6 +192,21 @@ g3cqR =
                 Exist x a : suc' -> 
                   Just [Left (ant, a' : Exist x a : suc'), Right "t"]
                     where a' = substFormula ["t"] substVar [(x,NewMeta "t")] a
+                _          -> Nothing)
+ ]
+
+g3cqR' = 
+  [("R/A", \ (ant,suc) -> 
+              case suc of
+                Univ x a : suc' -> 
+                  Just [Left (ant, a' : Univ x a : suc'), Right "?f"]
+                    where a' = substFormula ["?f"] substVar [(x,NewMeta "?f")] a
+                _          -> Nothing),
+  ("R/E", \ (ant,suc) -> 
+              case suc of
+                Exist x a : suc' -> 
+                  Just [Left (ant, a' : Exist x a : suc'), Right "?v"]
+                    where a' = substFormula ["?v"] substVar [(x,NewMeta "?v")] a
                 _          -> Nothing)
  ]
 
