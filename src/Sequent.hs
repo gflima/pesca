@@ -140,11 +140,14 @@ substVar subst term =
     _             -> term
 
 substTerm :: [(Ident,Term)] -> Term -> Term
-substTerm subst term =
+substTerm = substTerm' False
+
+substTerm' :: Bool -> [(Ident,Term)] -> Term -> Term
+substTerm' ignoreMeta subst term =
  case term of
-    Apply f terms -> Apply f (map (substTerm subst) terms)
+    Apply f terms -> Apply f (map (substTerm' ignoreMeta subst) terms)
     Meta  m       -> case lookup m subst of
-                       Just t -> t
+                       Just t | not ignoreMeta -> t
                        _      -> term
     NewMeta  m    -> case lookup m subst of
                        Just t -> t
@@ -154,7 +157,7 @@ substTerm subst term =
 makeParams :: [(Ident,Term)] -> Term -> Term
 makeParams subst term =
  case term of
-    Apply f terms -> Apply f (map (substTerm subst) terms)
+    Apply f terms -> Apply f (map (substTerm' True subst) terms)
     NewMeta  m    -> case lookup m subst of
                        Just t -> t
                        _      -> term
