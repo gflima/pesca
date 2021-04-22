@@ -89,6 +89,7 @@ data Command =
  | CShowGoals
  | CShowGoalsCompact
  | CShowGoal [Int]
+ | CShowGoalLen [Int]
  | CShowTree
  | CShowApplicable [Int]
  | CShowApplicableCompact [Int]
@@ -118,6 +119,7 @@ exec c env@(calculus,tree) =
    CShowGoals         -> (tree, prGoals False (goalsOfProof tree))
    CShowGoalsCompact  -> (tree, prGoals True (goalsOfProof tree))
    CShowGoal g        -> (tree, prGoals1 (goalsOfProof tree) g)
+   CShowGoalLen g     -> (tree, prGoals1Len (goalsOfProof tree) g)
    CShowTree          -> (tree, prProofNodes True tree)
    CShowApplicable g  -> (tree, showAllApplicableRules False (calculus,tree) g)
    CShowApplicableCompact g -> (tree, showAllApplicableRules True (calculus,tree) g)
@@ -142,6 +144,7 @@ helpMessage =
  "  s                            -  show subgoals"         ++++
  "  S                            -  show subgoals (compact)"         ++++
  "  Z goal                       -  show subgoal"         ++++
+ "  Y goal                       -  show lenght of subgoal"         ++++
  "  w                            -  show current proof tree" ++++
  "  a goal                       -  show rules applicable to goal" ++++
  "  A goal                       -  show rules applicable to goal (compact)" ++++
@@ -184,6 +187,8 @@ pCommand calculus =
   jL "S"                 <<< CShowGoalsCompact
  |||
   jL "Z" +.. pGoalId     *** CShowGoal
+ |||
+  jL "Y" +.. pGoalId     *** CShowGoalLen
  |||
   jL "w"                 <<< CShowTree
  |||
