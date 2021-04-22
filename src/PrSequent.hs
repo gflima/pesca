@@ -1,5 +1,7 @@
 module PrSequent where
 
+-- import Debug.Trace
+
 import PrelSequent
 import Sequent
 
@@ -51,9 +53,16 @@ prProofNodes sh tree = foldr1 lined (map prLine layers) ++ prParams where ---
 
 ---------
 
-prGoals goals = foldr (++++) "" (map prGoal goals) where
- prGoal (Left (ints,sequent)) = prGoalId ints +++ "=" +++ prSequent sequent
- prGoal (Right par)           = par +++ "=" +++ "?"
+prGoals compact goals = foldr (++++) "" (map prGoal goals) where
+ prGoal (Left (ints,sequent)) = prGoalId ints +++
+   (if compact then "" else "=" +++ prSequent sequent)
+ prGoal (Right par)           = par +++
+   (if compact then "" else "=" +++ "?")
+
+prGoals1 [] n = prGoalId n +++ "=" +++ "?\n"
+prGoals1 ((Left (n', seq)):rest) n
+  | n == n' = prGoalId n +++ "=" +++ prSequent seq ++ "\n"
+  | otherwise = prGoals1 rest n
 
 prGoalId n = foldl1 (++) (map show n) -- works for 1..9 only
 

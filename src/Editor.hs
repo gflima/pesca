@@ -87,8 +87,11 @@ data Command =
  | CNew    Sequent
  | CRemove [Int]
  | CShowGoals
+ | CShowGoalsCompact
+ | CShowGoal [Int]
  | CShowTree
  | CShowApplicable [Int]
+ | CShowApplicableCompact [Int]
  | CChange Calculus
  | CAxioms String
  | CQuit
@@ -112,9 +115,12 @@ exec c env@(calculus,tree) =
                             where t = Goal sequent
    CRemove ints       -> (t, m ++++ prProof t)
                             where (t,m) = remove tree ints
-   CShowGoals         -> (tree, prGoals (goalsOfProof tree))
+   CShowGoals         -> (tree, prGoals False (goalsOfProof tree))
+   CShowGoalsCompact  -> (tree, prGoals True (goalsOfProof tree))
+   CShowGoal g        -> (tree, prGoals1 (goalsOfProof tree) g)
    CShowTree          -> (tree, prProofNodes True tree)
-   CShowApplicable g  -> (tree, showAllApplicableRules (calculus,tree) g)
+   CShowApplicable g  -> (tree, showAllApplicableRules False (calculus,tree) g)
+   CShowApplicableCompact g -> (tree, showAllApplicableRules True (calculus,tree) g)
    CChange _          -> (tree, "")
    CAxioms file       -> (tree, "axioms written in" +++ file ++ ".rules.tex")
    CLatex file        -> (tree, "proof written in" +++ file ++ ".tex")
@@ -134,8 +140,11 @@ helpMessage =
  "  n sequent                    -  new sequent to prove"  ++++
  "  u node                       -  remove subtree node"   ++++
  "  s                            -  show subgoals"         ++++
+ "  S                            -  show subgoals (compact)"         ++++
+ "  Z goal                       -  show subgoal"         ++++
  "  w                            -  show current proof tree" ++++
  "  a goal                       -  show rules applicable to goal" ++++
+ "  A goal                       -  show rules applicable to goal (compact)" ++++
  "  c calculus                   -  change calculus into one of" ++++
  "                                  " ++ prCalculi                 ++++
  "  x file                       -  read axioms from file and write rules into" ++++
@@ -172,9 +181,15 @@ pCommand calculus =
  |||
   jL "s"                 <<< CShowGoals
  |||
+  jL "S"                 <<< CShowGoalsCompact
+ |||
+  jL "Z" +.. pGoalId     *** CShowGoal
+ |||
   jL "w"                 <<< CShowTree
  |||
   jL "a" +.. pGoalId     *** CShowApplicable
+ |||
+  jL "A" +.. pGoalId     *** CShowApplicableCompact
  |||
   jL "c" +.. pTList "+" pRuleIdent  *** CChange . Calculus
  |||
@@ -192,15 +207,15 @@ pCommand calculus =
 
 ---------------------
 
-showAllApplicableRules :: (AbsCalculus,Proof) -> [Int] -> String
-showAllApplicableRules (calculus,proof) ints =
+showAllApplicableRules :: Bool -> (AbsCalculus,Proof) -> [Int] -> String
+showAllApplicableRules compact (calculus,proof) ints =
  case lookup ints [x | Left x <- goalsOfProof proof] of
    Just sequent -> foldr (++++) [] (map prAr (allApplicableRules calculus sequent))
    _            -> prGoalId ints +++ "does not exist"
   where
     prAr ((sq,(i,j)),((r,_),_)) =
       "r" +++ prGoalId ints +++ "A" ++ show i +++ "S" ++ show j +++ r +++
-      "--" +++ prSequent sq
+      (if compact then "" else "--" +++ prSequent sq)
 
 -----------------------
 
