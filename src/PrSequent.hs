@@ -67,7 +67,7 @@ prGoals1 ((Left (n', seq)):rest) n
 prGoals1Len [] n = prGoalId n +++ "=" +++ "?\n"
 prGoals1Len ((Left (n', (seql,seqr))):rest) n
   | n == n' = prGoalId n +++ "=" +++ show (length seql) +++ show (length seqr) ++ "\n"
-  | otherwise = prGoals1 rest n
+  | otherwise = prGoals1Len rest n
 
 prGoalId n = foldl1 (++) (map show n) -- works for 1..9 only
 
