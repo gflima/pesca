@@ -31,7 +31,7 @@ welcomeMsg =
 editProofs :: (Env,[String]) -> IO (Proof,String)
 editProofs envh@(env@(calculus,tree),history) =
  do
- putStr "|- "
+ putStrLn "|- "
  hFlush stdout
  s <- catch getLine (\e -> if isEOFError e then return "q" else ioError e)
  let (comm,m0)  = case pCommand calculus s of
